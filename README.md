@@ -50,6 +50,8 @@ APIs
 1. a. URI: "/parking-service/onboard/new"
    b. Description: API to be invoked when a new Parking Space is to be Onboarded
    c. Request Body:    
+              
+              
               {
                   "name": "Indiranagar",
                   "zip_code": "560008",
@@ -83,22 +85,27 @@ APIs
  
  d. Response Body : Successfully onboarded new Parking Lot. : 200
  e. errorResponse : 
+                    
+                    
                     {
-                        errorMessage: "blahblah"
-                        status: StatusCode
-                        timestamp: epoch Timestamp
+                        "errorMessage" : "blahblah"
+                        "status" : 400
+                        "timestamp": 164786782
                     }
                     
                     
 2. a. URI: "/parking-service/booking/park"
    b. Descrption: API to be invoked to park a vehicle
    c. Request Body: 
+                
+                
                 {
                     "parking_lot_id" : 1,
                     "vehicle_size" : "SMALL",
                     "license_plate_number" : "qwerty",
                     "booking_duration_in_minutes" : 300
                 }
+                
    
    d. Response Body : 
    
