@@ -2,7 +2,6 @@ package com.parkingservice.project.entity;
 
 import com.parkingservice.project.enums.BookingStatus;
 import com.parkingservice.project.enums.VehicleSize;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,7 +19,7 @@ public class Booking implements Serializable {
     @Column(name = "booking_id")
     private Long id;
 
-    @Column(name = "booking_time")
+    @Column(name = "booking_time", nullable = false)
     private Long bookingTimestamp;
 
     @Column(name = "duration_minutes")

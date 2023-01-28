@@ -36,26 +36,30 @@ public class ParkingLotServiceImpl implements ParkingLotService {
         parkingLot.setName(parkingLotRequest.getName());
         parkingLot.setZipCode(parkingLotRequest.getZipCode());
         List<FloorRequest> floors = parkingLotRequest.getFloors();
-        parkingLot.setFloorCount(floors.stream().count());
+        parkingLot.setFloorCount((long) floors.size());
         parkingLot.setSlotCount(floors.stream()
-                .flatMap(floor -> floor.getSlots().stream())
-                .count());
+                .mapToLong(floor -> floor.getSlots().size())
+                .sum());
         List<Floor> floorEntities = getFloors(parkingLotRequest.getFloors());
         parkingLot.setFloor(floorEntities);
         ParkingLot createdParkingLot = parkingLotDao.createNew(parkingLot);
         long parkingLotId = createdParkingLot.getId();
         createdParkingLot.getFloor().stream()
                 .flatMap(floor -> floor.getSlots().stream())
-                        .forEach(slot -> {
-                            String key = getAvailableStackKey(parkingLotId, slot.getVehicleSize().ordinal());
-                            redisTemplate.opsForList().leftPush(key, slot);
-                        });
+                .forEach(slot -> {
+                    String key = getAvailableStackKey(parkingLotId, slot.getVehicleSize().ordinal());
+                    try {
+                        redisTemplate.opsForList().leftPush(key, slot);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
     }
 
     @Override
     public Slot getAvailableSlot(long parkingLotId, int size) throws SlotUnavailableException {
         String slotKey = getAvailableStackKey(parkingLotId, size);
-        Slot availableSlot = null;
+        Slot availableSlot;
         try {
             availableSlot = (Slot) redisTemplate.opsForList().leftPop(slotKey);
             if (Objects.isNull(availableSlot)) {
@@ -90,11 +94,19 @@ public class ParkingLotServiceImpl implements ParkingLotService {
         slot.setIsAvailable(isAvailable);
         if (isAvailable) {
             //Release Slot
-            redisTemplate.opsForHash().delete(BOOKED_SLOT_MAP, slot.getId());
+            try {
+                redisTemplate.opsForHash().delete(BOOKED_SLOT_MAP, slot.getId());
+            } catch (Exception e) {
+                //LOG Error message and continue
+            }
             updateReleaseInDb(slot);
         } else {
             //Book Slot
-            redisTemplate.opsForHash().put(BOOKED_SLOT_MAP, String.valueOf(slot.getId()), slot);
+            try {
+                redisTemplate.opsForHash().put(BOOKED_SLOT_MAP, String.valueOf(slot.getId()), slot);
+            } catch (Exception e) {
+                //LOG error and continue
+            }
             updateSlotBookingInDb(slot);
         }
     }
@@ -107,8 +119,12 @@ public class ParkingLotServiceImpl implements ParkingLotService {
     @Async
     private void updateReleaseInDb(Slot slot) {
         parkingLotDao.updateSlotAvailability(slot.getId(), ParkingServiceUtils.getIntForBoolean(slot.getIsAvailable()));
-        redisTemplate.opsForList().leftPush(getAvailableStackKey(slot.getFloor().getParkingLot().getId(),
-                slot.getVehicleSize().ordinal()), slot);
+        try {
+            redisTemplate.opsForList().leftPush(getAvailableStackKey(slot.getFloor().getParkingLot().getId(),
+                    slot.getVehicleSize().ordinal()), slot);
+        } catch (Exception e) {
+            //LOG error and continue
+        }
     }
 
     private List<Floor> getFloors(List<FloorRequest> floorsList) {
@@ -126,15 +142,15 @@ public class ParkingLotServiceImpl implements ParkingLotService {
             slots.add(convertToSlotEntity(floorRequest.getSlots().get(slotNumber), slotNumber + 1));
         }
         floorEntity.setSlots(slots);
-        floorEntity.setFloorNumber(Long.valueOf(floorNumber));
-        floorEntity.setSlotCount(floorRequest.getSlots().stream().count());
+        floorEntity.setFloorNumber((long) floorNumber);
+        floorEntity.setSlotCount((long) floorRequest.getSlots().size());
         return floorEntity;
     }
 
     private Slot convertToSlotEntity(SlotRequest slotRequest, int slotNumber) {
         Slot slotEntity = new Slot();
         slotEntity.setVehicleSize(slotRequest.getBaySize());
-        slotEntity.setSlotNumber(Long.valueOf(slotNumber));
+        slotEntity.setSlotNumber((long) slotNumber);
         slotEntity.setIsAvailable(true);
         return slotEntity;
     }
