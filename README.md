@@ -48,7 +48,9 @@ APIs
 ----
 
 1. a. URI: "/parking-service/onboard/new"
+
    b. Description: API to be invoked when a new Parking Space is to be Onboarded
+   
    c. Request Body:    
               
               
@@ -84,7 +86,8 @@ APIs
               }
  
  d. Response Body : Successfully onboarded new Parking Lot. : 200
- e. errorResponse : 
+ 
+e. errorResponse : 
                     
                     
                     {
@@ -95,7 +98,9 @@ APIs
                     
                     
 2. a. URI: "/parking-service/booking/park"
-   b. Descrption: API to be invoked to park a vehicle
+
+   b. Description: API to be invoked to park a vehicle
+   
    c. Request Body: 
                 
                 
@@ -121,9 +126,13 @@ APIs
                 }
                 
                 
+ 
 3. a. URI: "/parking-service/booking/unpark?ticket_id=12345"
+
    b. Description: API to free Parking Slot
+
    c. Request Param: ticket_id=12435
+
    d. Response Body : 
    
                     {
