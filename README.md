@@ -114,28 +114,7 @@ e. errorResponse :
    
    d. Response Body : 
    
-                {
-                    "ticketId" : 12345,
-                    "parkingLotId" : 12,
-                    "floorNumber" : 2,
-                    "slotNumber" : 400,
-                    "durationInMinutes" : 300,
-                    "licensePlateNumber" : "KA01 2311D",
-                    "parkingSlotSize" : 3,
-                    "ticketPrice" : 400
-                }
-                
-                
- 
-3. a. URI: "/parking-service/booking/unpark?ticket_id=12345"
-
-   b. Description: API to free Parking Slot
-
-   c. Request Param: ticket_id=12435
-
-   d. Response Body : 
-   
-                    {
+                 {
                         "ticket_id" : 123455,
                         "parking_lot_id" : 1234,
                         "floor_number" : 2,
@@ -145,5 +124,17 @@ e. errorResponse :
                         "parking_slot_size" : "SMALL",
                         "ticket_price" : 400
                     }
+                
+                
+ 
+3. a. URI: "/parking-service/booking/unpark?ticket_id=12345"
+
+   b. Description: API to free Parking Slot
+
+   c. Request Param: ticket_id=12435
+
+   d. Response :  "Successfully freed slot."
+   
+                   
    
               

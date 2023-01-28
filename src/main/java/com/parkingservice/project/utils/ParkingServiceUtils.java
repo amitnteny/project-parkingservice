@@ -11,6 +11,6 @@ public class ParkingServiceUtils {
     }
 
     public static String getAvailableStackKey(long parkingLotId, int vehicleSize) {
-        return parkingLotId + "|" + vehicleSize;
+        return parkingLotId + "-" + vehicleSize;
     }
 }

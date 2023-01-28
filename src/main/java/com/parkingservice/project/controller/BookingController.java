@@ -31,9 +31,9 @@ public class BookingController {
 
     @GetMapping(path = "/unpark", produces = APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity unPark(@RequestParam("ticket_id") Long ticketId) throws BadRequestException {
+    public ResponseEntity<String> unPark(@RequestParam("ticket_id") Long ticketId) throws BadRequestException {
         bookingService.freeSlot(ticketId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Successfully freed slot.");
     }
 
     @ExceptionHandler
