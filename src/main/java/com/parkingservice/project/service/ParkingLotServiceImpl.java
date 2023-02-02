@@ -32,16 +32,7 @@ public class ParkingLotServiceImpl implements ParkingLotService {
 
     @Override
     public void addNewParkingLot(ParkingLotRequest parkingLotRequest) {
-        ParkingLot parkingLot = new ParkingLot();
-        parkingLot.setName(parkingLotRequest.getName());
-        parkingLot.setZipCode(parkingLotRequest.getZipCode());
-        List<FloorRequest> floors = parkingLotRequest.getFloors();
-        parkingLot.setFloorCount((long) floors.size());
-        parkingLot.setSlotCount(floors.stream()
-                .mapToLong(floor -> floor.getSlots().size())
-                .sum());
-        List<Floor> floorEntities = getFloors(parkingLotRequest.getFloors());
-        parkingLot.setFloor(floorEntities);
+        ParkingLot parkingLot = getParkingLotObject(parkingLotRequest);
         ParkingLot createdParkingLot = parkingLotDao.createNew(parkingLot);
         long parkingLotId = createdParkingLot.getId();
         createdParkingLot.getFloor().stream()
@@ -54,6 +45,20 @@ public class ParkingLotServiceImpl implements ParkingLotService {
                         throw new RuntimeException(e);
                     }
                 });
+    }
+
+    private ParkingLot getParkingLotObject(ParkingLotRequest parkingLotRequest) {
+        ParkingLot parkingLot = new ParkingLot();
+        parkingLot.setName(parkingLotRequest.getName());
+        parkingLot.setZipCode(parkingLotRequest.getZipCode());
+        List<FloorRequest> floors = parkingLotRequest.getFloors();
+        parkingLot.setFloorCount((long) floors.size());
+        parkingLot.setSlotCount(floors.stream()
+                .mapToLong(floor -> floor.getSlots().size())
+                .sum());
+        List<Floor> floorEntities = getFloors(parkingLotRequest.getFloors());
+        parkingLot.setFloor(floorEntities);
+        return parkingLot;
     }
 
     @Override
